@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Style Transfer Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="page">
+        <header class="topbar">
+            <div>
+                <h1>Style Transfer</h1>
+            </div>
+            <div class="status-pill" id="globalStatus">Ready</div>
+        </header>
+
+        <section class="methods" aria-label="style transfer methods">
+            <form class="method-panel" id="classicForm">
+                <div class="panel-heading">
+                    <h2>经典优化式</h2>
+                    <span>Neural Style Transfer</span>
+                </div>
+
+                <div class="preview-row two">
+                    <figure>
+                        <img id="classicContentPreview" alt="经典方法内容图预览">
+                        <figcaption>内容图</figcaption>
+                    </figure>
+                    <figure>
+                        <img id="classicStylePreview" alt="经典方法风格图预览">
+                        <figcaption>风格图</figcaption>
+                    </figure>
+                </div>
+
+                <div class="controls-grid">
+                    <label>
+                        内容图
+                        <select id="classicContent" name="content"></select>
+                    </label>
+                    <label>
+                        风格图
+                        <select id="classicStyle" name="style"></select>
+                    </label>
+                    <label>
+                        高度
+                        <input id="classicHeight" type="number" min="128" max="1024" value="400">
+                    </label>
+                    <label>
+                        迭代
+                        <input id="classicIterations" type="number" min="1" max="5000" value="500">
+                    </label>
+                    <label>
+                        内容权重
+                        <input id="classicContentWeight" type="text" value="1e5">
+                    </label>
+                    <label>
+                        风格权重
+                        <input id="classicStyleWeight" type="text" value="3e4">
+                    </label>
+                    <label>
+                        TV 权重
+                        <input id="classicTvWeight" type="text" value="1e-2">
+                    </label>
+                    <label>
+                        初始化
+                        <select id="classicInit">
+                            <option value="content">content</option>
+                            <option value="style">style</option>
+                            <option value="random">random</option>
+                        </select>
+                    </label>
+                </div>
+
+                <button class="primary-button" type="submit">运行经典方法</button>
+
+                <div class="result-area">
+                    <div class="run-status" id="classicStatus">未运行</div>
+                    <img class="result-image" id="classicResult" alt="经典方法输出结果">
+                    <pre id="classicLog"></pre>
+                </div>
+            </form>
+
+            <form class="method-panel" id="fastForm">
+                <div class="panel-heading">
+                    <h2>快速前馈式</h2>
+                    <span>Fast Neural Style Transfer</span>
+                </div>
+
+                <div class="preview-row single">
+                    <figure>
+                        <img id="fastContentPreview" alt="快速方法内容图预览">
+                        <figcaption>内容图</figcaption>
+                    </figure>
+                </div>
+
+                <div class="controls-grid compact">
+                    <label>
+                        内容图
+                        <select id="fastContent" name="content"></select>
+                    </label>
+                    <label>
+                        模型
+                        <select id="fastModel" name="model"></select>
+                    </label>
+                </div>
+
+                <button class="primary-button" type="submit">运行快速方法</button>
+
+                <div class="result-area">
+                    <div class="run-status" id="fastStatus">未运行</div>
+                    <img class="result-image" id="fastResult" alt="快速方法输出结果">
+                    <pre id="fastLog"></pre>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
