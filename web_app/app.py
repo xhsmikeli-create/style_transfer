@@ -22,12 +22,15 @@ FAST_CONTENT_DIR = FAST_DIR / "images" / "content-images"
 FAST_MODEL_DIR = FAST_DIR / "saved_models"
 FAST_OUTPUT_DIR = FAST_DIR / "output"
 
+COMPARE_DIR = ROOT_DIR / "comparison_runs" / "requested_existing_models_20260510" / "report_images"
+
 MEDIA_ROOTS = {
     "classic-content": CLASSIC_CONTENT_DIR,
     "classic-style": CLASSIC_STYLE_DIR,
     "classic-output": CLASSIC_OUTPUT_DIR,
     "fast-content": FAST_CONTENT_DIR,
     "fast-output": FAST_OUTPUT_DIR,
+    "compare": COMPARE_DIR,
 }
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
@@ -171,6 +174,11 @@ def index():
     return render_template("index.html")
 
 
+@app.get("/compare")
+def compare():
+    return render_template("compare.html")
+
+
 @app.get("/api/assets")
 def assets():
     return jsonify({
@@ -183,6 +191,47 @@ def assets():
             "models": list_named_files(FAST_MODEL_DIR, MODEL_SUFFIXES),
         },
     })
+
+
+@app.get("/api/comparison")
+def comparison_assets():
+    cases = [
+        {
+            "id": "mountain",
+            "label": "山景",
+            "description": "天空、雪山、森林和近处树木，用于观察自然场景的色彩与纹理迁移。",
+        },
+        {
+            "id": "golden_gate",
+            "label": "金门桥",
+            "description": "桥塔、桥索和海面结构清晰，用于观察几何结构保持。",
+        },
+        {
+            "id": "lion",
+            "label": "狮子",
+            "description": "主体清晰且毛发细节丰富，用于观察高频纹理和五官结构保持。",
+        },
+    ]
+    variants = [
+        ("original", "原图", "{id}.jpg"),
+        ("real", "GAN 输入", "{id}_real.png"),
+        ("fastUkiyoe", "Fast Ukiyoe", "{id}_fast_ukiyoe.jpg"),
+        ("ganVanGogh", "GAN Van Gogh", "{id}_fake1.png"),
+        ("ganUkiyoe", "GAN Ukiyoe", "{id}_fake2.png"),
+    ]
+
+    payload = []
+    for item in cases:
+        images = {}
+        for key, label, pattern in variants:
+            path = COMPARE_DIR / pattern.format(id=item["id"])
+            images[key] = {
+                "label": label,
+                "name": path.name,
+                "url": media_url(path) if path.is_file() else None,
+            }
+        payload.append({**item, "images": images})
+    return jsonify({"cases": payload})
 
 
 @app.post("/api/run/classic")

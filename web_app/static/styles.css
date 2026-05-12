@@ -36,6 +36,29 @@ body {
     border-bottom: 1px solid var(--line);
 }
 
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ghost-link {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--text);
+    padding: 0 12px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.ghost-link:hover {
+    border-color: var(--accent);
+    color: var(--accent-dark);
+}
+
 h1,
 h2,
 p {
@@ -214,9 +237,210 @@ pre.active {
     color: var(--warn);
 }
 
+.compare-page {
+    max-width: 1480px;
+}
+
+.compare-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px 0;
+}
+
+.segmented {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--line);
+    background: #fff;
+}
+
+.segmented button {
+    min-height: 38px;
+    border: 0;
+    border-right: 1px solid var(--line);
+    background: transparent;
+    color: var(--text);
+    padding: 0 16px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.segmented button:last-child {
+    border-right: 0;
+}
+
+.segmented button.active {
+    background: var(--accent);
+    color: #fff;
+}
+
+.view-select {
+    min-width: 190px;
+}
+
+.focus-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 18px;
+    align-items: start;
+}
+
+.focus-main,
+.info-panel,
+.case-row {
+    background: var(--panel);
+    border: 1px solid var(--line);
+}
+
+.compare-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px;
+}
+
+.compare-card {
+    min-width: 0;
+}
+
+.image-frame {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #ecefea;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.image-frame span {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.compare-card figcaption {
+    min-height: 54px;
+    display: grid;
+    gap: 2px;
+    align-content: start;
+    text-align: left;
+}
+
+.compare-card figcaption strong {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.compare-card figcaption span {
+    color: var(--muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
+.info-panel {
+    padding: 16px;
+}
+
+.info-panel h2,
+.section-title h2,
+.case-row h3 {
+    margin: 0;
+}
+
+.info-panel h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+
+.info-panel p,
+.case-row p {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.info-panel dl {
+    margin: 16px 0 0;
+    display: grid;
+    gap: 12px;
+}
+
+.info-panel dt {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.info-panel dd {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+code {
+    background: #edf1ec;
+    color: var(--accent-dark);
+    padding: 1px 4px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.92em;
+}
+
+.all-cases {
+    padding-top: 22px;
+}
+
+.section-title {
+    margin-bottom: 12px;
+}
+
+.case-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.case-row {
+    display: grid;
+    grid-template-columns: 230px minmax(0, 1fr);
+    gap: 14px;
+    padding: 14px;
+}
+
+.case-row header {
+    align-self: start;
+}
+
+.case-images {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.compare-card.compact figcaption {
+    min-height: 46px;
+}
+
 @media (max-width: 900px) {
     .methods {
         grid-template-columns: 1fr;
+    }
+
+    .focus-layout,
+    .case-row {
+        grid-template-columns: 1fr;
+    }
+
+    .compare-strip,
+    .case-images {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -231,8 +455,32 @@ pre.active {
         flex-direction: column;
     }
 
+    .top-actions,
+    .compare-toolbar {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .ghost-link,
+    .status-pill {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .segmented {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .segmented button {
+        border-right: 1px solid var(--line);
+    }
+
     .preview-row.two,
-    .controls-grid {
+    .controls-grid,
+    .compare-strip,
+    .case-images {
         grid-template-columns: 1fr;
     }
 }

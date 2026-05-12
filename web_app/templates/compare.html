@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fast / GAN Comparison</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <main class="page compare-page">
+        <header class="topbar">
+            <div>
+                <h1>Fast / GAN 对比</h1>
+            </div>
+            <div class="top-actions">
+                <a class="ghost-link" href="{{ url_for('index') }}">返回运行页面</a>
+                <div class="status-pill" id="compareStatus">Loading</div>
+            </div>
+        </header>
+
+        <section class="compare-toolbar" aria-label="comparison controls">
+            <div class="segmented" id="caseTabs" role="tablist" aria-label="选择图片"></div>
+            <label class="view-select">
+                视图
+                <select id="viewMode">
+                    <option value="all">完整对比</option>
+                    <option value="ukiyoe">Ukiyoe 对比</option>
+                    <option value="gan">GAN 风格对比</option>
+                </select>
+            </label>
+        </section>
+
+        <section class="focus-layout">
+            <div class="focus-main">
+                <div class="compare-strip" id="compareStrip"></div>
+            </div>
+            <aside class="info-panel">
+                <h2 id="caseTitle">-</h2>
+                <p id="caseDescription">正在读取实验结果。</p>
+                <dl>
+                    <div>
+                        <dt>Fast</dt>
+                        <dd>已有 <code>ukiyoe.model</code>，一次前向传播。</dd>
+                    </div>
+                    <div>
+                        <dt>GAN</dt>
+                        <dd><code>fake1</code> 为 Van Gogh，<code>fake2</code> 为 Ukiyoe。</dd>
+                    </div>
+                    <div>
+                        <dt>输入</dt>
+                        <dd>三张图与报告中的结果文件一致。</dd>
+                    </div>
+                </dl>
+            </aside>
+        </section>
+
+        <section class="all-cases">
+            <div class="section-title">
+                <h2>三张图片总览</h2>
+            </div>
+            <div class="case-grid" id="caseGrid"></div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='compare.js') }}"></script>
+</body>
+</html>
