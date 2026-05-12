@@ -8,6 +8,10 @@ env/
 outputs/
 runs/
 checkpoints/
+data_box/input/*
+data_box/output/*
+!data_box/input/.gitkeep
+!data_box/output/.gitkeep
 *.pt
 *.pth
 *.onnx

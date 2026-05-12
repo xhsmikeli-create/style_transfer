@@ -86,9 +86,53 @@ figcaption,
     font-size: 13px;
 }
 
+.io-panel {
+    display: grid;
+    grid-template-columns: minmax(150px, 0.8fr) minmax(150px, 0.8fr) minmax(300px, 1.4fr);
+    align-items: end;
+    gap: 12px;
+    padding: 18px 0 0;
+}
+
+.folder-pair {
+    display: grid;
+    gap: 5px;
+    min-height: 64px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    background: #fff;
+}
+
+.folder-pair span,
+.file-control {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.folder-pair strong {
+    align-self: end;
+    color: var(--text);
+    font-size: 14px;
+    font-family: Consolas, "Courier New", monospace;
+    overflow-wrap: anywhere;
+}
+
+.upload-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: end;
+    gap: 10px;
+    min-height: 64px;
+}
+
+.file-control {
+    display: grid;
+    gap: 6px;
+}
+
 .methods {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     gap: 18px;
     padding-top: 20px;
@@ -176,28 +220,60 @@ input {
     font: inherit;
 }
 
+input[type="file"] {
+    padding: 7px 10px;
+}
+
 select:focus,
 input:focus {
     outline: 2px solid rgba(47, 125, 104, 0.22);
     border-color: var(--accent);
 }
 
+.primary-button,
+.secondary-button,
+.ghost-button {
+    min-height: 42px;
+    font: inherit;
+    cursor: pointer;
+}
+
 .primary-button {
     margin-top: auto;
     width: 100%;
-    min-height: 42px;
     border: 0;
     background: var(--accent);
     color: #fff;
-    font: inherit;
-    cursor: pointer;
 }
 
 .primary-button:hover {
     background: var(--accent-dark);
 }
 
-.primary-button:disabled {
+.secondary-button {
+    border: 0;
+    background: var(--accent);
+    color: #fff;
+    padding: 0 16px;
+}
+
+.secondary-button:hover {
+    background: var(--accent-dark);
+}
+
+.ghost-button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--text);
+    padding: 0 14px;
+}
+
+.ghost-button:hover {
+    border-color: var(--accent);
+    color: var(--accent-dark);
+}
+
+button:disabled {
     cursor: wait;
     opacity: 0.68;
 }
@@ -428,7 +504,17 @@ code {
     min-height: 46px;
 }
 
+@media (max-width: 1120px) {
+    .methods {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 900px) {
+    .io-panel {
+        grid-template-columns: 1fr;
+    }
+
     .methods {
         grid-template-columns: 1fr;
     }
@@ -466,6 +552,15 @@ code {
     .status-pill {
         width: 100%;
         justify-content: center;
+    }
+
+    .upload-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .secondary-button,
+    .ghost-button {
+        width: 100%;
     }
 
     .segmented {

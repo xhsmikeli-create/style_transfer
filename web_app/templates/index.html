@@ -13,60 +13,79 @@
                 <h1>Style Transfer</h1>
             </div>
             <div class="top-actions">
-                <a class="ghost-link" href="{{ url_for('compare') }}">查看 Fast / GAN 对比</a>
+                <a class="ghost-link" href="{{ url_for('compare') }}">Compare</a>
                 <div class="status-pill" id="globalStatus">Ready</div>
             </div>
         </header>
 
+        <section class="io-panel" aria-label="input and output folders">
+            <div class="folder-pair">
+                <span>Input</span>
+                <strong id="inputFolder">data_box/input</strong>
+            </div>
+            <div class="folder-pair">
+                <span>Output</span>
+                <strong id="outputFolder">data_box/output</strong>
+            </div>
+            <div class="upload-controls">
+                <label class="file-control">
+                    Image
+                    <input id="inputImage" type="file" accept="image/png,image/jpeg">
+                </label>
+                <button class="secondary-button" id="uploadButton" type="button">Upload</button>
+                <button class="ghost-button" id="cleanInputButton" type="button">Clean Input</button>
+            </div>
+        </section>
+
         <section class="methods" aria-label="style transfer methods">
             <form class="method-panel" id="classicForm">
                 <div class="panel-heading">
-                    <h2>经典优化式</h2>
+                    <h2>Classic Optimization</h2>
                     <span>Neural Style Transfer</span>
                 </div>
 
                 <div class="preview-row two">
                     <figure>
-                        <img id="classicContentPreview" alt="经典方法内容图预览">
-                        <figcaption>内容图</figcaption>
+                        <img class="preview-image" id="classicContentPreview" alt="Classic content preview">
+                        <figcaption>Content</figcaption>
                     </figure>
                     <figure>
-                        <img id="classicStylePreview" alt="经典方法风格图预览">
-                        <figcaption>风格图</figcaption>
+                        <img class="preview-image" id="classicStylePreview" alt="Classic style preview">
+                        <figcaption>Style</figcaption>
                     </figure>
                 </div>
 
                 <div class="controls-grid">
                     <label>
-                        内容图
+                        Content
                         <select id="classicContent" name="content"></select>
                     </label>
                     <label>
-                        风格图
+                        Style
                         <select id="classicStyle" name="style"></select>
                     </label>
                     <label>
-                        高度
+                        Height
                         <input id="classicHeight" type="number" min="128" max="1024" value="400">
                     </label>
                     <label>
-                        迭代
+                        Iterations
                         <input id="classicIterations" type="number" min="1" max="5000" value="500">
                     </label>
                     <label>
-                        内容权重
+                        Content Weight
                         <input id="classicContentWeight" type="text" value="1e5">
                     </label>
                     <label>
-                        风格权重
+                        Style Weight
                         <input id="classicStyleWeight" type="text" value="3e4">
                     </label>
                     <label>
-                        TV 权重
+                        TV Weight
                         <input id="classicTvWeight" type="text" value="1e-2">
                     </label>
                     <label>
-                        初始化
+                        Init
                         <select id="classicInit">
                             <option value="content">content</option>
                             <option value="style">style</option>
@@ -75,45 +94,78 @@
                     </label>
                 </div>
 
-                <button class="primary-button" type="submit">运行经典方法</button>
+                <button class="primary-button" id="classicRunButton" type="submit">Run Classic</button>
 
                 <div class="result-area">
-                    <div class="run-status" id="classicStatus">未运行</div>
-                    <img class="result-image" id="classicResult" alt="经典方法输出结果">
+                    <div class="run-status" id="classicStatus">Idle</div>
+                    <img class="result-image" id="classicResult" alt="Classic output result">
                     <pre id="classicLog"></pre>
                 </div>
             </form>
 
             <form class="method-panel" id="fastForm">
                 <div class="panel-heading">
-                    <h2>快速前馈式</h2>
+                    <h2>Fast Transfer</h2>
                     <span>Fast Neural Style Transfer</span>
                 </div>
 
                 <div class="preview-row single">
                     <figure>
-                        <img id="fastContentPreview" alt="快速方法内容图预览">
-                        <figcaption>内容图</figcaption>
+                        <img class="preview-image" id="fastContentPreview" alt="Fast content preview">
+                        <figcaption>Content</figcaption>
                     </figure>
                 </div>
 
                 <div class="controls-grid compact">
                     <label>
-                        内容图
+                        Content
                         <select id="fastContent" name="content"></select>
                     </label>
                     <label>
-                        模型
+                        Model
                         <select id="fastModel" name="model"></select>
                     </label>
                 </div>
 
-                <button class="primary-button" type="submit">运行快速方法</button>
+                <button class="primary-button" id="fastRunButton" type="submit">Run Fast</button>
 
                 <div class="result-area">
-                    <div class="run-status" id="fastStatus">未运行</div>
-                    <img class="result-image" id="fastResult" alt="快速方法输出结果">
+                    <div class="run-status" id="fastStatus">Idle</div>
+                    <img class="result-image" id="fastResult" alt="Fast output result">
                     <pre id="fastLog"></pre>
+                </div>
+            </form>
+
+            <form class="method-panel" id="ganForm">
+                <div class="panel-heading">
+                    <h2>GAN Transfer</h2>
+                    <span>pytorch-img2img</span>
+                </div>
+
+                <div class="preview-row single">
+                    <figure>
+                        <img class="preview-image" id="ganContentPreview" alt="GAN content preview">
+                        <figcaption>Content</figcaption>
+                    </figure>
+                </div>
+
+                <div class="controls-grid compact">
+                    <label>
+                        Content
+                        <select id="ganContent" name="content"></select>
+                    </label>
+                    <label>
+                        GAN Model
+                        <select id="ganModel" name="model"></select>
+                    </label>
+                </div>
+
+                <button class="primary-button" id="ganRunButton" type="submit">Run GAN</button>
+
+                <div class="result-area">
+                    <div class="run-status" id="ganStatus">Idle</div>
+                    <img class="result-image" id="ganResult" alt="GAN output result">
+                    <pre id="ganLog"></pre>
                 </div>
             </form>
         </section>

@@ -1,13 +1,25 @@
 const state = {
-    classicJob: null,
-    fastJob: null,
     timers: {},
+    assets: null,
 };
 
 const $ = (id) => document.getElementById(id);
 
-function fillSelect(select, items) {
+function fillSelect(select, items, emptyText) {
     select.innerHTML = "";
+
+    if (!items.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = emptyText;
+        option.disabled = true;
+        option.selected = true;
+        select.appendChild(option);
+        select.disabled = true;
+        return;
+    }
+
+    select.disabled = false;
     items.forEach((item) => {
         const option = document.createElement("option");
         option.value = item.name;
@@ -17,37 +29,109 @@ function fillSelect(select, items) {
     });
 }
 
+function selectIfExists(select, value) {
+    if (!value) return;
+    const option = [...select.options].find((item) => item.value === value);
+    if (option) select.value = value;
+}
+
 function updatePreview(select, image) {
     const option = select.selectedOptions[0];
     if (!option || !option.dataset.url) {
         image.removeAttribute("src");
+        image.classList.remove("ready");
         return;
     }
-    image.src = option.dataset.url;
+    image.src = `${option.dataset.url}?t=${Date.now()}`;
+    image.classList.add("ready");
 }
 
-async function loadAssets() {
+function updateRunButtons() {
+    const hasInputs = state.assets && state.assets.inputs.length > 0;
+    const hasModels = state.assets && state.assets.fast.models.length > 0;
+    const hasGanModels = state.assets && state.assets.gan.models.length > 0;
+    $("classicRunButton").disabled = !hasInputs;
+    $("fastRunButton").disabled = !hasInputs || !hasModels;
+    $("ganRunButton").disabled = !hasInputs || !hasGanModels;
+}
+
+async function loadAssets(selectedInput = null) {
     const response = await fetch("/api/assets");
-    const assets = await response.json();
+    state.assets = await response.json();
 
-    fillSelect($("classicContent"), assets.classic.contents);
-    fillSelect($("classicStyle"), assets.classic.styles);
-    fillSelect($("fastContent"), assets.fast.contents);
-    fillSelect($("fastModel"), assets.fast.models);
+    $("inputFolder").textContent = state.assets.folders.input;
+    $("outputFolder").textContent = state.assets.folders.output;
 
-    setDefault($("classicContent"), "bear.jpg");
-    setDefault($("classicStyle"), "candy.jpg");
-    setDefault($("fastContent"), "golden_gate.jpg");
-    setDefault($("fastModel"), "good.model");
+    fillSelect($("classicContent"), state.assets.classic.contents, "Upload an image first");
+    fillSelect($("classicStyle"), state.assets.classic.styles, "Upload an image first");
+    fillSelect($("fastContent"), state.assets.fast.contents, "Upload an image first");
+    fillSelect($("fastModel"), state.assets.fast.models, "No model found");
+    fillSelect($("ganContent"), state.assets.gan.contents, "Upload an image first");
+    fillSelect($("ganModel"), state.assets.gan.models, "No GAN model found");
+
+    selectIfExists($("classicContent"), selectedInput);
+    selectIfExists($("classicStyle"), selectedInput);
+    selectIfExists($("fastContent"), selectedInput);
+    selectIfExists($("ganContent"), selectedInput);
+    selectIfExists($("fastModel"), "good.model");
+    selectIfExists($("ganModel"), "style_vangogh_pretrained");
 
     updatePreview($("classicContent"), $("classicContentPreview"));
     updatePreview($("classicStyle"), $("classicStylePreview"));
     updatePreview($("fastContent"), $("fastContentPreview"));
+    updatePreview($("ganContent"), $("ganContentPreview"));
+    updateRunButtons();
 }
 
-function setDefault(select, value) {
-    const option = [...select.options].find((item) => item.value === value);
-    if (option) select.value = value;
+async function uploadInputImage() {
+    const fileInput = $("inputImage");
+    const file = fileInput.files[0];
+    if (!file) {
+        $("globalStatus").textContent = "Choose an image";
+        return;
+    }
+
+    const payload = new FormData();
+    payload.append("file", file);
+
+    $("uploadButton").disabled = true;
+    $("globalStatus").textContent = "Uploading";
+
+    try {
+        const response = await fetch("/api/upload", {
+            method: "POST",
+            body: payload,
+        });
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.error || "Upload failed");
+        }
+
+        fileInput.value = "";
+        $("globalStatus").textContent = "Ready";
+        await loadAssets(result.file.name);
+    } finally {
+        $("uploadButton").disabled = false;
+    }
+}
+
+async function cleanInputImages() {
+    $("cleanInputButton").disabled = true;
+    $("globalStatus").textContent = "Cleaning";
+
+    try {
+        const response = await fetch("/api/input/clean", {method: "POST"});
+        if (!response.ok) {
+            throw new Error(await response.text());
+        }
+        $("classicResult").classList.remove("ready");
+        $("fastResult").classList.remove("ready");
+        $("ganResult").classList.remove("ready");
+        $("globalStatus").textContent = "Ready";
+        await loadAssets();
+    } finally {
+        $("cleanInputButton").disabled = false;
+    }
 }
 
 async function startJob(kind, payload) {
@@ -65,10 +149,14 @@ async function startJob(kind, payload) {
 }
 
 function setRunning(kind, running) {
-    const button = kind === "classic"
-        ? $("classicForm").querySelector("button")
-        : $("fastForm").querySelector("button");
+    const buttons = {
+        classic: $("classicRunButton"),
+        fast: $("fastRunButton"),
+        gan: $("ganRunButton"),
+    };
+    const button = buttons[kind];
     button.disabled = running;
+    if (!running) updateRunButtons();
 }
 
 function pollJob(kind, jobId) {
@@ -101,17 +189,18 @@ function pollJob(kind, jobId) {
         if (job.status === "error") {
             clearInterval(state.timers[kind]);
             setRunning(kind, false);
-            statusEl.textContent = `失败：${job.error || "未知错误"}`;
+            statusEl.textContent = `Failed: ${job.error || "unknown error"}`;
+            statusEl.dataset.state = "error";
         }
     }, 1800);
 }
 
 function labelStatus(status) {
     return {
-        queued: "排队中",
-        running: "运行中",
-        done: "已完成",
-        error: "失败",
+        queued: "Queued",
+        running: "Running",
+        done: "Done",
+        error: "Failed",
     }[status] || status;
 }
 
@@ -127,11 +216,31 @@ $("fastContent").addEventListener("change", () => {
     updatePreview($("fastContent"), $("fastContentPreview"));
 });
 
+$("ganContent").addEventListener("change", () => {
+    updatePreview($("ganContent"), $("ganContentPreview"));
+});
+
+$("uploadButton").addEventListener("click", () => {
+    uploadInputImage().catch((error) => {
+        $("globalStatus").textContent = "Upload failed";
+        alert(error.message);
+    });
+});
+
+$("cleanInputButton").addEventListener("click", () => {
+    cleanInputImages().catch((error) => {
+        $("globalStatus").textContent = "Clean failed";
+        alert(error.message);
+    });
+});
+
 $("classicForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     setRunning("classic", true);
     $("classicResult").classList.remove("ready");
-    $("classicStatus").textContent = "提交中";
+    $("classicLog").classList.remove("active");
+    $("classicStatus").textContent = "Submitting";
+    $("classicStatus").dataset.state = "queued";
 
     try {
         const {jobId} = await startJob("classic", {
@@ -146,7 +255,8 @@ $("classicForm").addEventListener("submit", async (event) => {
         });
         pollJob("classic", jobId);
     } catch (error) {
-        $("classicStatus").textContent = `失败：${error.message}`;
+        $("classicStatus").textContent = `Failed: ${error.message}`;
+        $("classicStatus").dataset.state = "error";
         setRunning("classic", false);
     }
 });
@@ -155,7 +265,9 @@ $("fastForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     setRunning("fast", true);
     $("fastResult").classList.remove("ready");
-    $("fastStatus").textContent = "提交中";
+    $("fastLog").classList.remove("active");
+    $("fastStatus").textContent = "Submitting";
+    $("fastStatus").dataset.state = "queued";
 
     try {
         const {jobId} = await startJob("fast", {
@@ -164,8 +276,30 @@ $("fastForm").addEventListener("submit", async (event) => {
         });
         pollJob("fast", jobId);
     } catch (error) {
-        $("fastStatus").textContent = `失败：${error.message}`;
+        $("fastStatus").textContent = `Failed: ${error.message}`;
+        $("fastStatus").dataset.state = "error";
         setRunning("fast", false);
+    }
+});
+
+$("ganForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    setRunning("gan", true);
+    $("ganResult").classList.remove("ready");
+    $("ganLog").classList.remove("active");
+    $("ganStatus").textContent = "Submitting";
+    $("ganStatus").dataset.state = "queued";
+
+    try {
+        const {jobId} = await startJob("gan", {
+            content: $("ganContent").value,
+            model: $("ganModel").value,
+        });
+        pollJob("gan", jobId);
+    } catch (error) {
+        $("ganStatus").textContent = `Failed: ${error.message}`;
+        $("ganStatus").dataset.state = "error";
+        setRunning("gan", false);
     }
 });
 
