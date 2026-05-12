@@ -1,0 +1,41 @@
+----------------- Options ---------------
+             aspect_ratio: 1.0                           
+               batch_size: 1                             
+          checkpoints_dir: E:\style_transfer\gan_style_generate\model_weights	[default: ./model_weights]
+                crop_size: 256                           
+                 dataroot: E:\style_transfer\data_box\output\_gan_input_2ce8cdd142	[default: None]
+             dataset_mode: single                        
+                direction: AtoB                          
+          display_winsize: 256                           
+                    epoch: latest                        
+                     eval: True                          	[default: False]
+                init_gain: 0.02                          
+                init_type: normal                        
+                 input_nc: 3                             
+                  isTrain: False                         	[default: None]
+                load_iter: 0                             	[default: 0]
+                load_size: 256                           
+         max_dataset_size: inf                           
+                    model: test                          
+             model_suffix:                               
+               n_layers_D: 3                             
+                     name: style_ukiyoe_pretrained       	[default: experiment_name]
+                      ndf: 64                            
+                     netD: basic                         
+                     netG: resnet_9blocks                
+                      ngf: 64                            
+               no_dropout: True                          	[default: False]
+                  no_flip: False                         
+                     norm: instance                      
+                 num_test: 1                             	[default: 50]
+              num_threads: 4                             
+                output_nc: 3                             
+                    phase: test                          
+               preprocess: none                          	[default: resize_and_crop]
+              results_dir: E:\style_transfer\data_box\output\gan_runs\2ce8cdd142	[default: ./results/]
+           serial_batches: False                         
+                   suffix:                               
+                use_wandb: False                         
+                  verbose: False                         
+       wandb_project_name: CycleGAN                      
+----------------- End -------------------

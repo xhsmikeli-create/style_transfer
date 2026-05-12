@@ -12,7 +12,14 @@ data_box/input/*
 data_box/output/*
 !data_box/input/.gitkeep
 !data_box/output/.gitkeep
+fast_neural_style_transfer/output/
+fast_neural_style_transfer/.github/
+gan_style_generate/datasets/
+gan_style_generate/results/
+neural_style_transfer/.github/
 *.pt
 *.pth
+!fast_neural_style_transfer/saved_models/*.pth
+!gan_style_generate/model_weights/*/*.pth
 *.onnx
 *.h5
